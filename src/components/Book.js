@@ -3,7 +3,10 @@ import SelectShelf from "./SelectShelf";
 const Book = ({ book, handleUpdateBook }) => {
 	return (
 		<div className="book" id={book.id}>
-			{book.imageLinks && book.imageLinks.smallThumbnail && <img src={book.imageLinks.smallThumbnail} alt={book.title} />}
+			<SelectShelf book={book} handleUpdateBook={handleUpdateBook} />
+			{book.imageLinks && book.imageLinks.smallThumbnail && (
+				<img src={book.imageLinks.smallThumbnail} alt={book.title} />
+			)}
 			<div className="book-data">
 				<h4>{book.title}</h4>
 				{book.authors && (
@@ -14,7 +17,6 @@ const Book = ({ book, handleUpdateBook }) => {
 					</div>
 				)}
 			</div>
-			<SelectShelf book={book} handleUpdateBook={handleUpdateBook} />
 		</div>
 	);
 };

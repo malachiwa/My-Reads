@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Shelf from "./Shelf";
-import { search, get } from "../BooksAPI";
+import { search } from "../BooksAPI";
 
-const Search = ({ handleUpdateBook }) => {
+const Search = ({ books, handleUpdateBook }) => {
 	const [query, setQuery] = useState("");
 	const [resultBooks, setResultBooks] = useState([]);
 
@@ -13,30 +13,48 @@ const Search = ({ handleUpdateBook }) => {
 
 	useEffect(() => {
 		const getBooks = async () => {
-			const resBooks = await search(query, 1000);
+			const resBooks = await search(query, 1);
 
-			const calc = async (book) => {
-				return await get(book.id);
-			};
+			if (resBooks.length > 0) {
+				const arr = resBooks.map((book) => {
+					const replaseRes = books.filter((b) => {
+						return b.id === book.id ? true : false;
+					});
+					return replaseRes.length === 1 ? replaseRes[0] : book;
+				});
+				setResultBooks(arr);
+			} else {
+				setResultBooks([]);
+			}
 
-			const asyncFunc = async () => {
-				const unresolvedPromises = resBooks.map((book) => calc(book));
-				const results = await Promise.all(unresolvedPromises);
-				setResultBooks(results);
-			};
+			//old solution:
+			// const calc = async (book) => {
+			// 	return await get(book.id);
+			// };
 
-			resBooks.length > 0 ? asyncFunc() : setResultBooks([]);
+			// const asyncFunc = async () => {
+			// 	const unresolvedPromises = resBooks.map((book) => calc(book));
+			// 	const results = await Promise.all(unresolvedPromises);
+			// setResultBooks(results);
+			// };
+
+			// resBooks.length > 0 ? asyncFunc() : setResultBooks([]);
 		};
 
 		query.length === 0 ? setResultBooks([]) : getBooks();
-
-	}, [query]);
+	}, [query, books]);
 
 	return (
 		<div>
-			<Link to="/">Back</Link>
-			<h2>Search</h2>
-			<input onChange={(e) => changeQuery(e)} />
+			<div className="search-books-bar">
+				<Link className="close-search" to="/">
+					Back
+				</Link>
+				<input
+					placeholder="Search by title, author, or ISBN"
+					onChange={(e) => changeQuery(e)}
+				/>
+			</div>
 			{resultBooks.length > 0 && (
 				<Shelf
 					listBooks={resultBooks}

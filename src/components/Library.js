@@ -25,7 +25,7 @@ const Library = ({ books, handleUpdateBook }) => {
 					return book.shelf === "read";
 				})}
 			/>
-			<Link to="/search">+</Link>
+			<Link className="go-to-search" to="/search">+</Link>
 		</div>
 	);
 };

@@ -2,7 +2,7 @@ import Book from "./Book";
 
 const Shelf = ({ name, listBooks, handleUpdateBook }) => {
 	return (
-		<div>
+		<div className="shelf">
 			{name && (<h3>{name}</h3>)}
 			<div className="list-books">
 				{listBooks.length > 0 && listBooks.map((book) => (
