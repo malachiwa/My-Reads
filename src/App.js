@@ -12,7 +12,7 @@ function App() {
 		const update = async () => {
 			await BooksAPI.update(book, newShelf);
 
-			if (book.shelf === "none") {
+			if (!book.shelf) {
 				book.shelf = newShelf;
 				setBooks([...books, book]);
 			} else {

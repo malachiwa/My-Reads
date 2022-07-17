@@ -147,3 +147,10 @@ option {
   border: none;
   outline: none;
 }
+
+.books-not-found {
+  text-align: center;
+    margin-top: 3vw;
+    font-size: calc(3vw + 1px);
+    font-weight: 800;
+}

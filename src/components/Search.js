@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
 import Shelf from "./Shelf";
 import { search } from "../BooksAPI";
+import useDebounce from "../useDebounce";
 
 const Search = ({ books, handleUpdateBook }) => {
 	const [query, setQuery] = useState("");
 	const [resultBooks, setResultBooks] = useState([]);
+	const [error, setError] = useState(false);
+
+	const debouncedValue = useDebounce(query, 500);
 
 	const changeQuery = (e) => {
 		setQuery(e.target.value);
@@ -13,9 +18,10 @@ const Search = ({ books, handleUpdateBook }) => {
 
 	useEffect(() => {
 		const getBooks = async () => {
-			const resBooks = await search(query, 1);
+			const resBooks = await search(debouncedValue, 1);
 
 			if (resBooks.length > 0) {
+				setError(false);
 				const arr = resBooks.map((book) => {
 					const replaseRes = books.filter((b) => {
 						return b.id === book.id ? true : false;
@@ -24,25 +30,13 @@ const Search = ({ books, handleUpdateBook }) => {
 				});
 				setResultBooks(arr);
 			} else {
+				setError(true);
 				setResultBooks([]);
 			}
-
-			//old solution:
-			// const calc = async (book) => {
-			// 	return await get(book.id);
-			// };
-
-			// const asyncFunc = async () => {
-			// 	const unresolvedPromises = resBooks.map((book) => calc(book));
-			// 	const results = await Promise.all(unresolvedPromises);
-			// setResultBooks(results);
-			// };
-
-			// resBooks.length > 0 ? asyncFunc() : setResultBooks([]);
 		};
 
-		query.length === 0 ? setResultBooks([]) : getBooks();
-	}, [query, books]);
+		debouncedValue.length === 0 ? setResultBooks([]) : getBooks();
+	}, [debouncedValue, books]);
 
 	return (
 		<div>
@@ -55,14 +49,23 @@ const Search = ({ books, handleUpdateBook }) => {
 					onChange={(e) => changeQuery(e)}
 				/>
 			</div>
-			{resultBooks.length > 0 && (
+			{resultBooks.length > 0 ? (
 				<Shelf
 					listBooks={resultBooks}
 					handleUpdateBook={handleUpdateBook}
 				/>
+			) : error ? (
+				<div className="books-not-found">Books not found :/</div>
+			) : (
+				""
 			)}
 		</div>
 	);
 };
+
+Search.prototypes = {
+	handleUpdateBook: PropTypes.func.isRequired,
+	books: PropTypes.array.isRequired
+}
 
 export default Search;
